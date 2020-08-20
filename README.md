@@ -1,5 +1,5 @@
 # Line detection with Canny Filter and Hough Transform on streamed-video
-    https://www.youtube.com/watch?v=o4SDztEzwpo
+https://www.youtube.com/watch?v=o4SDztEzwpo
     
 In this tutorial, we apply the same technic based on Canny Filter and Hough Transform to detect lines.  
 *My previous tutorial on line-detection based on Canny Filter and Hough Transform of a static image*
@@ -59,7 +59,7 @@ We introduce color_keep_range and color_remove_range.
     result, k                          = color_remove_range(result, RGB_thd_remove)
 
 I used RGB pick to identify numerically [R G B] value of pixels that need to be removed :  color_keep_range
-RGB pick &#8595;<img src="images/grass_color_picked.png" alt="Drawing" style="width: 500px;"/>
+RGB pick &#8595;<img src="images/grass_color_picked.png" alt="Drawing" style="width: 300px;"/>
 
 We also put kernel_size at a higher value (15) to keep dirties on windshield out of line detection.
 
