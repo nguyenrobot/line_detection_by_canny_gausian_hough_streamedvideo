@@ -1,6 +1,7 @@
 # Line detection with Canny Filter and Hough Transform on streamed-video
+    https://www.youtube.com/watch?v=o4SDztEzwpo
     
-In this tutorial, we apply the same technic based on Canny Filter and Hough Transform to detect lines.
+In this tutorial, we apply the same technic based on Canny Filter and Hough Transform to detect lines.  
 *My previous tutorial on line-detection based on Canny Filter and Hough Transform of a static image*
 https://github.com/nguyenrobot/line_detection_by_canny_gausian_hough  
 
