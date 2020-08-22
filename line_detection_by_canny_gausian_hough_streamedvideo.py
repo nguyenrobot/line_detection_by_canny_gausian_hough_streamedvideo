@@ -80,7 +80,7 @@ def region_of_interest(img, vertices):
     masked_image = cv2.bitwise_and(img, mask)
     return masked_image
 
-def draw_lines(img, lines, color=[255, 0, 0], thickness=2):
+def draw_lines(img, lines, color=[255, 0, 0], thickness=5):
     """
     NOTE: this is the function you might want to use as a starting point once you want to 
     average/extrapolate the line segments you detect to map out the full
@@ -97,10 +97,46 @@ def draw_lines(img, lines, color=[255, 0, 0], thickness=2):
     If you want to make the lines semi-transparent, think about combining
     this function with the weighted_img() function below
     """
-    for line in lines:
-        for x1,y1,x2,y2 in line:
-            cv2.line(img, (x1, y1), (x2, y2), color, thickness)
+    frame_lines      = np.copy(img)
+    frame_lines[:,:] = [0, 0, 0]
+            
+    frame_lines_1st = np.copy(img)
+    frame_lines_1st[:,:] = [0, 0, 0]
+    
+    frame_lines_2nd = np.copy(img)
+    frame_lines_2nd[:,:] = [0, 0, 0]    
+        
+    if lines is not None:
+        for line in lines:
+            for x1,y1,x2,y2 in line:
+                frame_lines[y1, x1] = [255, 255, 255]
+                frame_lines[y2, x2] = [255, 255, 255]
+                thickness_i = 2
+                cv2.line(frame_lines_1st, (x1, y1), (x2, y2), [255, 255, 255], thickness_i)
 
+    frame_lines_1st     = grayscale(frame_lines_1st)
+    # Gaussian filter
+    kernel_size     = 1
+    #frame_lines_1st = gaussian_blur(frame_lines_1st, kernel_size)
+
+    # Canny edge detection
+    low_threshold   = 25
+    high_threshold  = 150
+    #frame_lines_1st = canny(frame_lines_1st, low_threshold, high_threshold)
+    
+    # Hough Transform
+    minLineLength   = 1
+    maxLineGap      = 150
+    rho             = 1
+    theta           = np.pi/1440
+    minimum_vote    = 100
+    lines_2nd_hough = hough_lines(frame_lines_1st, rho, theta, minimum_vote, minLineLength, maxLineGap)
+    
+    if lines_2nd_hough is not None:
+        for line in lines_2nd_hough:
+            for x1,y1,x2,y2 in line:
+                cv2.line(img, (x1, y1), (x2, y2), color, thickness)
+    
 def hough_lines(img, rho, theta, threshold, min_line_len, max_line_gap):
     """
     `img` should be the output of a Canny transform.
@@ -109,8 +145,8 @@ def hough_lines(img, rho, theta, threshold, min_line_len, max_line_gap):
     """
     lines = cv2.HoughLinesP(img, rho, theta, threshold, np.array([]), minLineLength=min_line_len, maxLineGap=max_line_gap)
     line_img = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
-    draw_lines(line_img, lines)
-    return line_img
+    #draw_lines(line_img, lines)
+    return lines #line_img
 
 # Python 3 has support for cool math symbols.
 
@@ -209,10 +245,14 @@ def process_image(image):
     rho             = 1
     theta           = np.pi/1440
     minimum_vote    = 30
-    result          = hough_lines(result, rho, theta, minimum_vote, minLineLength, maxLineGap)
+    lines           = hough_lines(result, rho, theta, minimum_vote, minLineLength, maxLineGap)
+    
+    # Draw lines
+    line_img = np.zeros((image.shape[0], image.shape[1], 3), dtype=np.uint8)
+    draw_lines(line_img, lines)
     
     # Display the result on original video
-    result          = weighted_img(result, image)
+    result          = weighted_img(line_img, image)
 
     return result
 
